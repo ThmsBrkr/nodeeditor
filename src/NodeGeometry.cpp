@@ -34,6 +34,9 @@ NodeGeometry(std::unique_ptr<NodeDataModel> const &dataModel)
   , _fontMetrics(QFont())
   , _boldFontMetrics(QFont())
 {
+  auto const &nodeStyle = StyleCollection::nodeStyle();
+  _spacing = static_cast<unsigned int>(nodeStyle.NodeSpacing);
+
   QFont f; f.setBold(true);
 
   _boldFontMetrics = QFontMetrics(f);

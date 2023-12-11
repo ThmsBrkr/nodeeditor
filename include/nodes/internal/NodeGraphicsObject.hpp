@@ -54,6 +54,9 @@ public:
   void
   lock(bool locked);
 
+  void setSceneRectChangeBlocked(bool sceneRectChangeBlocked);
+  bool isSceneRectChangeBlocked() const;
+
 protected:
   void
   paint(QPainter*                       painter,
@@ -88,7 +91,6 @@ protected:
   contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
 
 private:
-
   void
   embedQWidget();
 
@@ -99,6 +101,8 @@ private:
   Node& _node;
 
   bool _locked;
+
+  bool _sceneRectChangeBlocked;
 
   // either nullptr or owned by parent QGraphicsItem
   QGraphicsProxyWidget * _proxyWidget;

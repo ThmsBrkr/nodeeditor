@@ -29,6 +29,7 @@ NodeGraphicsObject(FlowScene &scene,
   , _node(node)
   , _locked(false)
   , _proxyWidget(nullptr)
+  , _sceneRectChangeBlocked(false)
 {
   _scene.addItem(this);
 
@@ -41,15 +42,6 @@ NodeGraphicsObject(FlowScene &scene,
   setCacheMode( QGraphicsItem::DeviceCoordinateCache );
 
   auto const &nodeStyle = node.nodeDataModel()->nodeStyle();
-
-  {
-    auto effect = new QGraphicsDropShadowEffect;
-    effect->setOffset(4, 4);
-    effect->setBlurRadius(20);
-    effect->setColor(nodeStyle.ShadowColor);
-
-    setGraphicsEffect(effect);
-  }
 
   setOpacity(nodeStyle.Opacity);
 
@@ -189,6 +181,16 @@ itemChange(GraphicsItemChange change, const QVariant &value)
 {
   if (change == ItemPositionChange && scene())
   {
+	  QPointF newPos = value.toPointF();
+	  QRectF rect = scene()->sceneRect();
+
+	  if (!rect.contains(newPos)) {
+		// Keep the item inside the scene rect.
+	    newPos.setX(qMin(rect.right(), qMax(newPos.x(), rect.left())));
+	    newPos.setY(qMin(rect.bottom(), qMax(newPos.y(), rect.top())));
+        return newPos;
+	  }
+
     moveConnections();
   }
 
@@ -317,11 +319,14 @@ mouseMoveEvent(QGraphicsSceneMouseEvent * event)
     event->ignore();
   }
 
+  if (!_sceneRectChangeBlocked)
+  {
   QRectF r = scene()->sceneRect();
 
   r = r.united(mapToScene(boundingRect()).boundingRect());
 
   scene()->setSceneRect(r);
+  }
 }
 
 
@@ -414,4 +419,18 @@ NodeGraphicsObject::
 contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 {
   _scene.nodeContextMenu(node(), mapToScene(event->pos()));
+}
+
+void
+NodeGraphicsObject::
+setSceneRectChangeBlocked(bool sceneRectChangeBlocked)
+{
+  _sceneRectChangeBlocked = sceneRectChangeBlocked;
+}
+
+bool
+NodeGraphicsObject::
+isSceneRectChangeBlocked() const
+{
+  return _sceneRectChangeBlocked;
 }

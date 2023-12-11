@@ -24,7 +24,9 @@
 
     "ConnectionPointDiameter": 8.0,
 
-    "Opacity": 0.8
+    "Opacity": 0.8,
+    "BorderRadius": 3.0,
+    "NodeSpacing": 20.0
   },
   "ConnectionStyle": {
     "ConstructionColor": "gray",
